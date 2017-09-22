@@ -4,7 +4,7 @@ def generator(z, y):
     with tf.variable_scope("generator"):
         
         inputs = tf.concat(values=[z, y],axis=1)
-        G_h1 = tf.layers.dense(z,
+        G_h1 = tf.layers.dense(inputs,
                                128,
                                activation=tf.nn.relu,
                                kernel_initializer=tf.glorot_normal_initializer())
@@ -13,10 +13,9 @@ def generator(z, y):
         return G_prob
 
 def discriminator(x, y, reuse):
-    with tf.variable_scope("discriminator"):
-        
+    with tf.variable_scope("discriminator"):       
         inputs = tf.concat(values=[x, y],axis=1)
-        D_h1 = tf.layers.dense(x,
+        D_h1 = tf.layers.dense(inputs,
                                128,
                                reuse = reuse,
                                activation=tf.nn.relu,
