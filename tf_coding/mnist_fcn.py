@@ -52,11 +52,11 @@ y_ = tf.placeholder(tf.int32, [None])
 y_one = tf.one_hot(y_,10)
 
 # Define Model parameters
-w1 = tf.get_variable('w1',shape=[784, 512], initializer=tf.random_normal_initializer())
+w1 = tf.get_variable('w1',shape=[784, 512], initializer=tf.glorot_uniform_initializer())
 b1 = tf.get_variable('b1',shape=[512], initializer=tf.zeros_initializer)
 
 
-w2 = tf.get_variable('w2',shape=[512, 10], initializer=tf.random_normal_initializer())
+w2 = tf.get_variable('w2',shape=[512, 10], initializer=tf.glorot_uniform_initializer())
 b2 = tf.get_variable('b2',shape=[10], initializer=tf.zeros_initializer)
 
 h1 = tf.matmul(x, w1) + b1
@@ -104,13 +104,30 @@ tf.global_variables_initializer().run()
 
 
 # Train Model for 1000 steps
+hist_train_acc = []
+hist_valid_acc = []
 for step in range(1000):
     batch_xs, batch_ys = mnist.train.next_batch(128)
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
     if (step % 100 == 0):
         acc_train = sess.run(accuracy, feed_dict={x: train_data, y_: train_labels})
         acc_valid = sess.run(accuracy, feed_dict={x: test_data, y_: test_labels})
+        hist_train_acc.append(acc_train)
+        hist_valid_acc.append(acc_valid)
         print("Accuracy: [T] %.4f / [V] %.4f" % (acc_train,acc_valid))
 
 print(sess.run(y_pred, feed_dict={x: test_data,y_: test_labels}))
+
+
+# In[8]:
+
+
+import matplotlib.pyplot as plt
+x = [x*100 for x in range(10)]
+line_train, = plt.plot(x, hist_train_acc, label='Training')
+line_test, = plt.plot(x, hist_valid_acc, label='Test')
+plt.xlabel('# of Step')
+plt.ylabel('Accuracy')
+plt.legend(handles=[line_train,line_test], loc=4)
+plt.show()
 
