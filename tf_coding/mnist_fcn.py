@@ -46,22 +46,22 @@ print(test_labels.shape)
 # In[3]:
 
 
-# Define Model Input (x) and Output (y_),  y_ = f(x)
-x = tf.placeholder(tf.float32, [None, 784])
-y_ = tf.placeholder(tf.int32, [None])
-y_one = tf.one_hot(y_,10)
+# # Define Model Input (x) and Output (y_),  y_ = f(x)
+# x = tf.placeholder(tf.float32, [None, 784])
+# y_ = tf.placeholder(tf.int32, [None])
+# y_one = tf.one_hot(y_,10)
 
-# Define Model parameters
-w1 = tf.get_variable('w1',shape=[784, 512], initializer=tf.glorot_uniform_initializer())
-b1 = tf.get_variable('b1',shape=[512], initializer=tf.zeros_initializer)
+# # Define Model parameters
+# w1 = tf.get_variable('w1',shape=[784, 512], initializer=tf.glorot_uniform_initializer())
+# b1 = tf.get_variable('b1',shape=[512], initializer=tf.zeros_initializer)
 
 
-w2 = tf.get_variable('w2',shape=[512, 10], initializer=tf.glorot_uniform_initializer())
-b2 = tf.get_variable('b2',shape=[10], initializer=tf.zeros_initializer)
+# w2 = tf.get_variable('w2',shape=[512, 10], initializer=tf.glorot_uniform_initializer())
+# b2 = tf.get_variable('b2',shape=[10], initializer=tf.zeros_initializer)
 
-h1 = tf.matmul(x, w1) + b1
-h1_relu = tf.nn.relu(h1)
-y = tf.matmul(h1_relu, w2) + b2
+# h1 = tf.matmul(x, w1) + b1
+# h1_relu = tf.nn.relu(h1)
+# y = tf.matmul(h1_relu, w2) + b2
 
 
 # #  Define Model Structure (tf.leyers)
@@ -69,13 +69,13 @@ y = tf.matmul(h1_relu, w2) + b2
 # In[4]:
 
 
-# # Define Model Input (x) and Output (y_),  y_ = f(x)
-# x = tf.placeholder(tf.float32, [None, 784])
-# y_ = tf.placeholder(tf.int32, [None])
-# y_one = tf.one_hot(y_,10)
-# h1 = tf.layers.dense(x,512,activation=None)
-# h1_relu = tf.nn.relu(h1)
-# y = tf.layers.dense(h1_relu,10,activation=None)
+# Define Model Input (x) and Output (y_),  y_ = f(x)
+x = tf.placeholder(tf.float32, [None, 784])
+y_ = tf.placeholder(tf.int32, [None])
+y_one = tf.one_hot(y_,10)
+h1 = tf.layers.dense(x,512,activation=None)
+h1_relu = tf.nn.relu(h1)
+y = tf.layers.dense(h1_relu,10,activation=None)
 
 
 # In[5]:
@@ -119,11 +119,11 @@ for step in range(1000):
 print(sess.run(y_pred, feed_dict={x: test_data,y_: test_labels}))
 
 
-# In[8]:
+# In[7]:
 
 
 import matplotlib.pyplot as plt
-x = [x*100 for x in range(10)]
+x = [x*100 for x in range(len(hist_train_acc))]
 line_train, = plt.plot(x, hist_train_acc, label='Training')
 line_test, = plt.plot(x, hist_valid_acc, label='Test')
 plt.xlabel('# of Step')
