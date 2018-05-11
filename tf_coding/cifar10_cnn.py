@@ -192,35 +192,46 @@ X_train, X_test, Y_train, Y_test = read_dataset(dataset_path, "img")
 # In[4]:
 
 
+def conv_blk (inputs, name = 'conv_blk'):
+    with tf.name_scope(name):
+        c1 = tf.layers.conv2d(inputs,filters=32,kernel_size=[3,3],strides=(1,1),padding='same')
+        c1_relu = tf.nn.relu(c1)
+        c2 = tf.layers.conv2d(c1_relu,filters=32,kernel_size=[3,3],strides=(1,1),padding='valid')
+        c2_relu = tf.nn.relu(c2)
+        mxp = tf.layers.max_pooling2d(c2_relu,pool_size=[2,2],strides=(1,1))
+        do = tf.layers.dropout(mxp,rate=0.2)
+        return do
+
+
+# In[5]:
+
+
 # Define Model Input (x) and Output (y_),  y_ = f(x)
 x = tf.placeholder(tf.float32, [None, 32,32,3])
 y_ = tf.placeholder(tf.int32, [None])
 y_one = tf.one_hot(y_,classes)
 
 # convolutional part
-c1 = tf.layers.conv2d(x,filters=32,kernel_size=[3,3],strides=(1,1),padding='same')
-c1_relu = tf.nn.relu(c1)
-c2 = tf.layers.conv2d(c1_relu,filters=32,kernel_size=[3,3],strides=(1,1),padding='same')
-c2_relu = tf.nn.relu(c2)
-mxp = tf.layers.max_pooling2d(c2_relu,pool_size=[2,2],strides=(1,1))
-do = tf.layers.dropout(mxp,rate=0.5)
+h1 = conv_blk(x, name='conv_blk1')
+h2 = conv_blk(h1, name='conv_blk2')
 
-flt = tf.layers.flatten(do)
+flt = tf.layers.flatten(h2)
 
 # fully connected part
 f1 = tf.layers.dense(flt,512,activation=None)
 f1_relu = tf.nn.relu(f1)
+f1_do = tf.layers.dropout(f1_relu,rate=0.5)
 y = tf.layers.dense(f1_relu,10,activation=None)
 
 
-# In[5]:
+# In[6]:
 
 
 # Define the Model Loss (4)
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_one, logits=y))
 
 # Define the Optimizer (5)
-train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
 
 y_pred = tf.argmax(tf.nn.softmax(y), 1, output_type=tf.int32)
 
@@ -235,7 +246,7 @@ tf.global_variables_initializer().run()
 
 # # Data iterator
 
-# In[6]:
+# In[7]:
 
 
 def get_batch(X, Y, batch_size = 128):
@@ -256,15 +267,17 @@ def get_batch(X, Y, batch_size = 128):
 
 # # Training & Evaluation
 
-# In[7]:
+# In[8]:
 
 
 batches = get_batch(X_train, Y_train, 128)
 # Train Model for 1000 steps
-for step in range(1000):
+hist_train_acc = []
+hist_valid_acc = []
+for step in range(5000):
     batch_xs, batch_ys = next(batches)
     sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
-    if (step % 100 == 0):
+    if (step % 250 == 0):
         # get training accr
         idx = np.arange(len(X_train))    
         tb = int(len(X_train)/500)
@@ -285,4 +298,25 @@ for step in range(1000):
         acc_valid.append(sess.run(accuracy, feed_dict={x: t_batch_x, y_: t_batch_y}))
         
         print("Accuracy: [T] %.4f / [V] %.4f" % (np.mean(acc_train),np.mean(acc_valid)))
+        hist_train_acc.append(np.mean(acc_train))
+        hist_valid_acc.append(np.mean(acc_valid))
+
+
+# In[9]:
+
+
+sess.close()
+
+
+# In[10]:
+
+
+import matplotlib.pyplot as plt
+x = [x*250 for x in range(len(hist_train_acc))]
+line_train, = plt.plot(x, hist_train_acc, label='Training')
+line_test, = plt.plot(x, hist_valid_acc, label='Test')
+plt.xlabel('# of Step')
+plt.ylabel('Accuracy')
+plt.legend(handles=[line_train,line_test], loc=4)
+plt.show()
 
