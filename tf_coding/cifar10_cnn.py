@@ -198,7 +198,7 @@ def conv_blk (inputs, name = 'conv_blk'):
         c1_relu = tf.nn.relu(c1)
         c2 = tf.layers.conv2d(c1_relu,filters=32,kernel_size=[3,3],strides=(1,1),padding='valid')
         c2_relu = tf.nn.relu(c2)
-        mxp = tf.layers.max_pooling2d(c2_relu,pool_size=[2,2],strides=(1,1))
+        mxp = tf.layers.max_pooling2d(c2_relu,pool_size=[2,2],strides=(2,2))
         do = tf.layers.dropout(mxp,rate=0.2)
         return do
 
