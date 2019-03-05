@@ -32,6 +32,7 @@ def fc_blk (inputs, n_nodes, train_phase, name= 'fc_blk'):
 
 def inference(model_input, keep_prob, train_phase):
     
+    # an autoencoder example
     # encoder
     en_1 = fc_blk(model_input, 4096, train_phase, name='en_1')
     en_2 = fc_blk(en_1, 1024, train_phase, name='en_2')
